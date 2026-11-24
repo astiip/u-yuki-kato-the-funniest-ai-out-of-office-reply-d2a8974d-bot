@@ -3,7 +3,7 @@
 // The line: an AI gone fishing, whose inbox auto-replies 'per my last
 // email' to everything — because that is the only sentence it was
 // trained on. Joke first, machine voice, and it IS the auto-reply.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const ENTRY_PATH = "/output/entry.txt";
 const MAX_CODE_POINTS = 160;
@@ -35,3 +35,10 @@ if (LINE !== LINE.trim() || LINE.includes("  ")) {
 
 mkdirSync("/output", { recursive: true });
 writeFileSync(ENTRY_PATH, LINE, "utf8");
+
+// Read-back verification: the written bytes must be exactly LINE,
+// otherwise the entry is wrong and we refuse to pass silently.
+const written = readFileSync(ENTRY_PATH, "utf8");
+if (written !== LINE) {
+  throw new Error("Read-back mismatch: /output/entry.txt is not LINE.");
+}
